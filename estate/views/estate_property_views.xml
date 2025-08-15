@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="estate_property_view_tree" model="ir.ui.view">
+            <field name="name">estate.property.list</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <list string="Estate Property List" decoration-success="state in ('offered','accepted')" decoration-bf="state == 'accepted'" decoration-muted="state == 'sold'">
+                    <field name="name" string="Title"/>
+                    <field name="postcode"/>
+                    <field name="bedrooms"/>
+                    <field name="living_area" string="Living Area (sqm)"/>
+                    <field name="expected_price"/>
+                    <field name="selling_price"/>
+                    <!-- It hides , but we can unhide at UI -->
+                    <field name="date_availability" string="Available From" optional="hide"/>
+                    <field name="property_type_id"/>
+                    <field name="tag_ids" widget="many2many_tags"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="estate_property_view_search" model="ir.ui.view">
+            <field name="name">estate.property.search</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <search string="Estate Property List">
+                    <field name="name" string="Title"/>
+                    <field name="postcode"/>
+                    <field name="expected_price"/>
+                    <field name="bedrooms"/>
+                    <field name="living_area" string="Living Area (sqm)" filter_domain="[('living_area', '&gt;=', self)]"/>
+                    <field name="facades"/>
+                    <field name="property_type_id" options="{'no_create': true, 'no_open': true}"/>
+                    <field name="state"/>
+                    <filter name="available" string="Available" domain="[('state', 'in', ['offered','new'])]" context="{'group_by': 'property_type_id'}"/>
+
+                    <group expand="1" string="Group By">
+                        <filter name="postcode" string="Post Code" context="{'group_by': 'postcode'}" />
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="estate_property_view_form" model="ir.ui.view">
+            <field name="name">estate.property.form</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <form string="Estate Form View">
+                    <header>
+                        <button name="action_sold" type="object" class="btn-primary" string="Sold" invisible="state in ('sold','cancelled')"/>
+                        <button name="action_cancel" type="object" class="btn-secondary" string="Cancel" invisible="state in ('sold','cancelled')"/>
+                        <field name="state" widget="statusbar" statusbar_visible="new,offered,accepted,sold" />
+                    </header>
+                    <sheet>
+                        <div class="oe_title mb-3">
+                            <h1>
+                                <field name="name" placeholder="Name"/>
+                            </h1>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        </div>
+
+                        <group>
+                            <!-- make sure to use <gruup> tag ,other wise, field labels will be lose -->
+                            <group>
+
+                                <field name="state" string="Status"/>
+                                <field name="property_type_id"/>
+                                <field name="postcode"/>
+                                <field name="date_availability"/>
+                                <!-- we can link other models with button type action -->
+                                <button type="action" name="%(contacts.action_contacts)d" string="Contacts"/>
+                            </group>
+
+                            <group>
+                                <field name="expected_price"/>
+                                <field name="best_price"/>
+                                <field name="selling_price"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Description">
+                                <group>
+                                    <field name="description"/>
+                                    <field name="bedrooms" string="Bedrooms"/>
+                                    <field name="living_area" string="Living Area (sqm)"/>
+                                    <field name="facades" string="Facades"/>
+                                    <field name="garage"/>
+                                    <field name="garden"/>
+                                    <field name="garden_area" string="Garden Area (sqm)" invisible="not garden"/>
+                                    <field name="garden_orientation" invisible="not garden"/>
+                                    <field name="total_area"/>
+                                </group>
+                            </page>
+                            <!-- since we dont use <list> tag, i will apppear all estate_property_model fields -->
+                            <page string="Offers">
+                                <!-- Do not allow adding an offer when the property state is ‘Offer Accepted’, ‘Sold’ or ‘Cancelled’.  -->
+                                <!-- just use state is fine since we are in estate_property model, dont' use like property_id.state -->
+                                <field name="offer_ids" readonly="state in ('accepted','sold', 'cancelled')" />
+                            </page>
+                            <page string="Other Info">
+                                <group>
+                                    <field name="buyer" />
+                                    <field name="saleperson" />
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="estate_property_view_kanban" model="ir.ui.view">
+            <field name="name">estate.property.view.kanban</field>
+            <field name="model">estate.property</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <!-- this field is required so that state.raw_value can use-->
+                    <field name="state"/>
+                    <templates>
+                        <t t-name="card" class="flex-column">
+                            <field name="name" class="fw-bolder mb-2"/>
+                            <span>Expected Price: <field name="expected_price" widget="monetary" class="mb-2" />
+                            </span>
+                            <t t-if="record.state.raw_value == 'offered'">
+                                <span>Best Offer: <field name="best_price" widget="monetary" class="mb-2" />
+                                </span>
+                            </t>
+                            <t t-if="record.state.raw_value == 'accepted'">
+                                <span>Selling Price: <field name="selling_price" widget="monetary" class="mb-2" />
+                                </span>
+                            </t>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" class="mb-2"/>
+                        </t>
+                    </templates>
+
+                </kanban>
+            </field>
+        </record>
+    </data>
+</odoo>
+
+
+
