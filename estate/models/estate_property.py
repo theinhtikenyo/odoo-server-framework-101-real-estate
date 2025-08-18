@@ -14,7 +14,8 @@ class EstateProperty(models.Model):
 
     name = fields.Char(string="Name", required=True)
     description = fields.Text(string="Description")
-    postcode = fields.Char(string="Postcode")
+    estate_location = fields.Many2one("estate.property.location")
+    postcode = fields.Integer(string="Postcode", related="estate_location.zip")
     date_availability = fields.Date(
         string="Date Availability",
         default=lambda self: fields.Datetime.now() + relativedelta(months=3),

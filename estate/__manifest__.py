@@ -23,6 +23,7 @@ Long description of module's purpose
         "views/estate_property_tag_views.xml",
         "views/estate_property_offer_views.xml",
         "views/res_users.xml",
+        "views/estate_property_location_views.xml",
     ],
     # only loaded in demonstration mode
     "demo": [

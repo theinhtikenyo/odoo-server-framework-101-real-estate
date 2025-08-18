@@ -63,7 +63,7 @@
                         <group>
                             <!-- make sure to use <gruup> tag ,other wise, field labels will be lose -->
                             <group>
-
+                                <field name="estate_location" />
                                 <field name="state" string="Status"/>
                                 <field name="property_type_id"/>
                                 <field name="postcode"/>
